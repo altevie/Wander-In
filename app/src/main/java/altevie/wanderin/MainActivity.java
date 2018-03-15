@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import altevie.wanderin.utility.ClsGetJson;
+import altevie.wanderin.utility.GlobalObject;
 import altevie.wanderin.utility.SyncResult;
 
 import static altevie.wanderin.R.*;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected IndoorLocationView indoorLocationView;
     protected final SyncResult syncResult = new SyncResult();
     protected Context context;
+    ScanningIndoorLocationManager indoorLocationManager;
 
 
     @Override
@@ -79,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         queue = Volley.newRequestQueue(this);
         context = this;
         indoorLocationView = (IndoorLocationView) findViewById(R.id.indoor_view);
-
-
+        GlobalObject g = (GlobalObject)getApplication();
+        loc = g.getLocation();
 
         String[] from = new String[] {"NOME"};
         int[] to = new int[]  {id.textView};
@@ -111,6 +113,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        CloudCredentials cloudCredentials = new EstimoteCloudCredentials("test-application-nnq","5e9063d4ff9e1939d41321e4cd81bcb4");
+        indoorLocationView.setLocation(loc);
+        indoorLocationManager = new IndoorLocationManagerBuilder(this, loc, cloudCredentials)
+                .withDefaultScanner()
+                .build();
+        indoorLocationManager.setOnPositionUpdateListener(new OnPositionUpdateListener() {
+            @Override
+            public void onPositionUpdate(LocationPosition locationPosition) {
+                indoorLocationView.updatePosition(locationPosition);
+            }
+
+            @Override
+            public void onPositionOutsideLocation() {
+                indoorLocationView.hidePosition();
+            }
+        });
         /*final CloudCredentials cloudCredentials = new EstimoteCloudCredentials("test-application-nnq","5e9063d4ff9e1939d41321e4cd81bcb4");
         IndoorCloudManager cloudManager = new IndoorCloudManagerFactory().create(this, cloudCredentials);
 
@@ -153,12 +171,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         //((ScanningIndoorLocationManager)syncResult.getResult()).startPositioning();
+        indoorLocationManager.startPositioning();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         //((ScanningIndoorLocationManager)syncResult.getResult()).stopPositioning();
+        indoorLocationManager.stopPositioning();
     }
 
     @Override

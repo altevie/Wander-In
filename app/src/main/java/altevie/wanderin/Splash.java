@@ -31,7 +31,8 @@ public class Splash extends AppCompatActivity {
         cloudManager.getLocation("test-location-42w", new CloudCallback<Location>() {
                     @Override
                     public void success(Location location) {
-                        ((GlobalObject)this.getApplication()).setLocation(location);
+                        GlobalObject g = (GlobalObject)getApplication();
+                        g.setLocation(location);
                         startMainActivity();
 
                     }
@@ -46,7 +47,6 @@ public class Splash extends AppCompatActivity {
 
     private void startMainActivity(){
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("Location", loc);
         startActivity(intent);
     }
 }
