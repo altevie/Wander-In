@@ -2,4 +2,8 @@
     <string name="app_name">WanderIn</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="app_id">test-application-nnq</string>
+    <string name="app_token">5e9063d4ff9e1939d41321e4cd81bcb4</string>
+    <string name="loc_id">test-location-42w</string>
+    <string name="url">https://wanderinp1941441869trial.hanatrial.ondemand.com/publicOdata/POIOdata/ZREADPOI.xsodata/POI?$format=json</string>
 </resources>
