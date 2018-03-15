@@ -68,23 +68,6 @@ public class ClsGetJson {
                 Toast.makeText(context, "Problema con la sincronizzazione dei POI", Toast.LENGTH_LONG).show();
             }
         });
-
-        /*try{
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpPost = new HttpGet(url);
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            HttpEntity httpEntity = httpResponse.getEntity();
-            strjson = EntityUtils.toString(httpEntity);
-            jObj = new JSONObject(strjson);
-        }catch (UnsupportedEncodingException e){
-            e.printStackTrace();
-        }catch (ClientProtocolException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }catch (JSONException e){
-            Log.e("JSON Parser", "Error parsing data "+e.toString());
-        }*/
         queue.start();
         queue.add(jor);
 
