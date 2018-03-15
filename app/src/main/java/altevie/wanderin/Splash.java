@@ -25,13 +25,13 @@ public class Splash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_splash);
-        final CloudCredentials cloudCredentials = new EstimoteCloudCredentials("test-application-nnq","5e9063d4ff9e1939d41321e4cd81bcb4");
+        final CloudCredentials cloudCredentials = new EstimoteCloudCredentials(getString(R.string.app_id),getString(R.string.app_token));
         IndoorCloudManager cloudManager = new IndoorCloudManagerFactory().create(this, cloudCredentials);
-
-        cloudManager.getLocation("test-location-42w", new CloudCallback<Location>() {
+        final GlobalObject g = (GlobalObject)getApplication();
+        g.setCloudCredentials(cloudCredentials);
+        cloudManager.getLocation(getString(R.string.loc_id), new CloudCallback<Location>() {
                     @Override
                     public void success(Location location) {
-                        GlobalObject g = (GlobalObject)getApplication();
                         g.setLocation(location);
                         startMainActivity();
 

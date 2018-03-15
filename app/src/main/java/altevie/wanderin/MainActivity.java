@@ -47,8 +47,6 @@ import static altevie.wanderin.R.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String url = "https://wanderinp1941441869trial.hanatrial.ondemand.com/publicOdata/POIOdata/ZREADPOI.xsodata/POI?$format=json";
-
     protected ArrayList<HashMap<String,String>> listHashMap;
     private ClsGetJson getJson;
     private JSONArray jArray;
@@ -88,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         int[] to = new int[]  {id.textView};
         mAdapter = new SimpleAdapter(this, listHashMap, layout.line_style, from, to);
         listView.setAdapter(mAdapter);
-        getJson.getJSONFromUrl(this,url, queue, listHashMap, mAdapter);
+        getJson.getJSONFromUrl(this,getString(string.url), queue, listHashMap, mAdapter);
 
         mDrawerLayout = findViewById(id.drawer_layout);
         mActivityTitle = getTitle().toString();
@@ -113,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        CloudCredentials cloudCredentials = new EstimoteCloudCredentials("test-application-nnq","5e9063d4ff9e1939d41321e4cd81bcb4");
+        CloudCredentials cloudCredentials = g.getCloudCredentials();
         indoorLocationView.setLocation(loc);
         indoorLocationManager = new IndoorLocationManagerBuilder(this, loc, cloudCredentials)
                 .withDefaultScanner()
@@ -129,55 +127,17 @@ public class MainActivity extends AppCompatActivity {
                 indoorLocationView.hidePosition();
             }
         });
-        /*final CloudCredentials cloudCredentials = new EstimoteCloudCredentials("test-application-nnq","5e9063d4ff9e1939d41321e4cd81bcb4");
-        IndoorCloudManager cloudManager = new IndoorCloudManagerFactory().create(this, cloudCredentials);
-
-        cloudManager.getLocation("test-location-42w", new CloudCallback<Location>() {
-            @Override
-            public void success(Location location) {
-                indoorLocationView.setLocation(location);
-                ScanningIndoorLocationManager indoorLocationManager = new IndoorLocationManagerBuilder(context, loc, cloudCredentials)
-                        .withDefaultScanner()
-                        .build();
-
-
-                indoorLocationManager.setOnPositionUpdateListener(new OnPositionUpdateListener() {
-                    @Override
-                    public void onPositionUpdate(LocationPosition locationPosition) {
-                        indoorLocationView.updatePosition(locationPosition);
-                    }
-
-                    @Override
-                    public void onPositionOutsideLocation() {
-                        indoorLocationView.hidePosition();
-                    }
-                });
-
-                syncResult.setResult(indoorLocationManager);
-            }
-
-            @Override
-            public void failure(EstimoteCloudException e) {
-
-            }
-        });*/
-
-
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        //((ScanningIndoorLocationManager)syncResult.getResult()).startPositioning();
         indoorLocationManager.startPositioning();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        //((ScanningIndoorLocationManager)syncResult.getResult()).stopPositioning();
         indoorLocationManager.stopPositioning();
     }
 
