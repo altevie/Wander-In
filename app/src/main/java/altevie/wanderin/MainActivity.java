@@ -28,6 +28,7 @@ import com.estimote.indoorsdk_module.cloud.IndoorCloudManager;
 import com.estimote.indoorsdk_module.cloud.IndoorCloudManagerFactory;
 import com.estimote.indoorsdk_module.cloud.Location;
 import com.estimote.indoorsdk_module.cloud.LocationPosition;
+import com.estimote.indoorsdk_module.common.helpers.EstimoteIndoorHelper;
 import com.estimote.indoorsdk_module.view.IndoorLocationView;
 import com.estimote.internal_plugins_api.cloud.CloudCredentials;
 
@@ -87,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new SimpleAdapter(this, listHashMap, layout.line_style, from, to);
         listView.setAdapter(mAdapter);
         getJson.getJSONFromUrl(this,getString(string.url), queue, listHashMap, mAdapter);
+
+        EstimoteIndoorHelper estimoteIndoorHelper = new EstimoteIndoorHelper();
 
         mDrawerLayout = findViewById(id.drawer_layout);
         mActivityTitle = getTitle().toString();
