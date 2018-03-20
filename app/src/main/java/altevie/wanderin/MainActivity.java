@@ -1,8 +1,6 @@
 package altevie.wanderin;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,34 +9,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.estimote.cloud_plugin.common.EstimoteCloudCredentials;
 import com.estimote.indoorsdk.IndoorLocationManagerBuilder;
-import com.estimote.indoorsdk_module.algorithm.IndoorLocationManager;
 import com.estimote.indoorsdk_module.algorithm.OnPositionUpdateListener;
 import com.estimote.indoorsdk_module.algorithm.ScanningIndoorLocationManager;
-import com.estimote.indoorsdk_module.cloud.CloudCallback;
-import com.estimote.indoorsdk_module.cloud.EstimoteCloudException;
-import com.estimote.indoorsdk_module.cloud.IndoorCloudManager;
-import com.estimote.indoorsdk_module.cloud.IndoorCloudManagerFactory;
 import com.estimote.indoorsdk_module.cloud.Location;
 import com.estimote.indoorsdk_module.cloud.LocationPosition;
-import com.estimote.indoorsdk_module.common.helpers.EstimoteIndoorHelper;
 import com.estimote.indoorsdk_module.view.IndoorLocationView;
 import com.estimote.internal_plugins_api.cloud.CloudCredentials;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import altevie.wanderin.utility.ClsGetJson;
 import altevie.wanderin.utility.GlobalObject;
@@ -76,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         getJson = new ClsGetJson();
         listHashMap = new ArrayList<HashMap<String, String>>();
-        listView = (ListView)findViewById(id.POIList);
+        listView = (ListView)findViewById(R.id.POIList);
         queue = Volley.newRequestQueue(this);
         context = this;
         indoorLocationView = (IndoorLocationView) findViewById(R.id.indoor_view);
@@ -87,9 +77,15 @@ public class MainActivity extends AppCompatActivity {
         int[] to = new int[]  {id.textView};
         mAdapter = new SimpleAdapter(this, listHashMap, layout.line_style, from, to);
         listView.setAdapter(mAdapter);
-        getJson.getJSONFromUrl(this,getString(string.url), queue, listHashMap, mAdapter);
 
-        EstimoteIndoorHelper estimoteIndoorHelper = new EstimoteIndoorHelper();
+        final Button update = (Button)findViewById(id.update);
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getJson.getJSONFromUrl(context,getString(string.url), queue, listHashMap, mAdapter, indoorLocationView, update);
+            }
+        });
+        getJson.getJSONFromUrl(this,getString(string.url), queue, listHashMap, mAdapter, indoorLocationView, update);
 
         mDrawerLayout = findViewById(id.drawer_layout);
         mActivityTitle = getTitle().toString();
@@ -99,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
-            /** Called when a drawer has settled in a completely closed state. */
+            // Called when a drawer has settled in a completely closed state.
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()

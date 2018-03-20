@@ -2,7 +2,9 @@ package altevie.wanderin.utility;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Cache;
@@ -17,6 +19,8 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.estimote.indoorsdk_module.cloud.LocationPosition;
+import com.estimote.indoorsdk_module.view.IndoorLocationView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,6 +38,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import altevie.wanderin.R;
+
 /**
  * Created by PiervincenzoAstolfi on 04/03/2018.
  */
@@ -42,22 +48,29 @@ public class ClsGetJson {
     static JSONObject jObj = null;
     static String strjson = "";
     private JSONArray jArray;
-    public void getJSONFromUrl(final Context context, String url, RequestQueue queue, final ArrayList<HashMap<String, String>> listHashMap, final BaseAdapter mAdapter){
+    public void getJSONFromUrl(final Context context, String url, RequestQueue queue, final ArrayList<HashMap<String, String>> listHashMap, final BaseAdapter mAdapter, final IndoorLocationView indoorLocationView, final Button update){
 
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try{
                     jArray = response.getJSONObject("d").getJSONArray("results");
+                    ArrayList<LocationPosition> arrayList = new ArrayList<LocationPosition>();
                     for(int i = 0; i < jArray.length(); i++){
                         JSONObject json = jArray.getJSONObject(i);
                         String luogo = json.getString("NOME");
                         HashMap<String,String> map = new HashMap<String,String>();
                         map.put("NOME", luogo);
                         listHashMap.add(map);
+                        //double x = jArray.getJSONObject(i).getDouble("LAT");
+                        //double y = jArray.getJSONObject(i).getDouble("LON");
+                        arrayList.add(new LocationPosition(jArray.getJSONObject(i).getDouble("LAT"),jArray.getJSONObject(i).getDouble("LON"),245.00));
+
                     }
+                    indoorLocationView.setCustomPoints(arrayList);
                     mAdapter.notifyDataSetChanged();
                     Toast.makeText(context, "Lista caricata correttamente", Toast.LENGTH_LONG).show();
+                    update.setVisibility(View.INVISIBLE);
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
@@ -66,6 +79,7 @@ public class ClsGetJson {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(context, "Problema con la sincronizzazione dei POI", Toast.LENGTH_LONG).show();
+                update.setVisibility(View.VISIBLE);
             }
         });
         queue.start();
