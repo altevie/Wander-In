@@ -1,6 +1,10 @@
 package altevie.wanderin;
 
+import android.app.Dialog;
+import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -23,6 +28,7 @@ import com.estimote.indoorsdk_module.cloud.Location;
 import com.estimote.indoorsdk_module.cloud.LocationPosition;
 import com.estimote.indoorsdk_module.view.IndoorLocationView;
 import com.estimote.internal_plugins_api.cloud.CloudCredentials;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -105,20 +111,81 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(MainActivity.this, "Hai cliccato", Toast.LENGTH_SHORT).show();
                 mDrawerLayout.closeDrawers();
+                final Dialog d = new Dialog(context);
+                HashMap item = listHashMap.get(i);
+                d.setTitle(item.get("NOME").toString());
+                d.setCancelable(false);
+                switch(item.get("DATA_TYPE").toString()){
+                    case "MESSAGE":
+                        d.setContentView(layout.message);
+                        TextView tv = (TextView) d.findViewById(id.textView2);
+                        tv.setText(item.get("DATA").toString());
+                        Button okMessage = (Button)d.findViewById(id.messageok);
+                        okMessage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                d.cancel();
+                            }
+                        });
+                        break;
+                    case "URL":
+                        d.setContentView(layout.url);
+                        TextView tvUrl = (TextView) d.findViewById(id.textView3);
+                        if(!item.get("DATA").toString().contains("http://") || !item.get("DATA").toString().contains("https://")){
+                            tvUrl.setText("http://" + item.get("DATA").toString());
+                        }else {
+                            tvUrl.setText(item.get("DATA").toString());
+                        }
+                        Button okUrl = (Button)d.findViewById(id.urlok);
+                        okUrl.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                d.cancel();
+                            }
+                        });
+
+                        Button apriUrl = (Button)d.findViewById(id.urlapri);
+                        apriUrl.setOnClickListener(new View.OnClickListener(){
+                            public void onClick(View view) {
+                                d.cancel();
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(((TextView)d.findViewById(id.textView3)).getText().toString()));
+                                startActivity(browserIntent);
+                            }
+                        });
+                        break;
+                }
+
+
+
+
+
+                d.show();
+                /*String lat = item.get("LAT").toString();
+                String lon = item.get("LON").toString();
+                Toast.makeText(MainActivity.this, lat+lon, Toast.LENGTH_SHORT).show();
+                mDrawerLayout.closeDrawers();*/
             }
         });
 
         CloudCredentials cloudCredentials = g.getCloudCredentials();
         indoorLocationView.setLocation(loc);
+        Notification.Builder notification = new Notification.Builder(this);
+        notification.setSmallIcon(R.drawable.beacon_grey_small);
+        notification.setContentTitle("Wander-In");
+        notification.setContentText("Indoor location in esecuzione...");
+        notification.build();
+
+        Notification not = notification.getNotification();
+
         indoorLocationManager = new IndoorLocationManagerBuilder(this, loc, cloudCredentials)
-                .withDefaultScanner()
+                .withScannerInForegroundService(not)
                 .build();
         indoorLocationManager.setOnPositionUpdateListener(new OnPositionUpdateListener() {
             @Override
             public void onPositionUpdate(LocationPosition locationPosition) {
                 indoorLocationView.updatePosition(locationPosition);
+                getJson.nearPosition(context, locationPosition);
             }
 
             @Override
@@ -126,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 indoorLocationView.hidePosition();
             }
         });
+        indoorLocationManager.startPositioning();
     }
 
     @Override

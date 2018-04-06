@@ -59,8 +59,17 @@ public class ClsGetJson {
                     for(int i = 0; i < jArray.length(); i++){
                         JSONObject json = jArray.getJSONObject(i);
                         String luogo = json.getString("NOME");
+                        String lat = json.getString("LAT");
+                        String lon = json.getString("LON");
+                        String data = json.getString("DATA");
+                        String data_type = json.getString("DATA_TYPE");
+
                         HashMap<String,String> map = new HashMap<String,String>();
                         map.put("NOME", luogo);
+                        map.put("LAT", lat);
+                        map.put("LON", lon);
+                        map.put("DATA", data);
+                        map.put("DATA_TYPE", data_type);
                         listHashMap.add(map);
                         //double x = jArray.getJSONObject(i).getDouble("LAT");
                         //double y = jArray.getJSONObject(i).getDouble("LON");
@@ -84,6 +93,21 @@ public class ClsGetJson {
         });
         queue.start();
         queue.add(jor);
+    }
 
+    public void nearPosition(final Context context,LocationPosition locationPosition){
+        try {
+            for (int i = 0; i < jArray.length(); i++) {
+                JSONObject json = jArray.getJSONObject(i);
+                Double lat = json.getDouble("LAT");
+                Double lon = json.getDouble("LON");
+                if(Math.sqrt(Math.pow(lat - locationPosition.getX(), 2) + Math.pow(lon - locationPosition.getY(), 2))<= 2){
+                    String info = json.getString("DATA");
+                    Toast.makeText(context, info, Toast.LENGTH_LONG).show();
+                }
+            }
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
     }
 }
