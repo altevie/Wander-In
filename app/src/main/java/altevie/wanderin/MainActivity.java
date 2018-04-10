@@ -4,6 +4,10 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.net.Uri;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,7 +21,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -38,6 +41,7 @@ import java.util.HashMap;
 
 import altevie.wanderin.utility.ClsGetJson;
 import altevie.wanderin.utility.GlobalObject;
+import altevie.wanderin.utility.PathView;
 import altevie.wanderin.utility.SyncResult;
 
 import static altevie.wanderin.R.*;
@@ -69,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(drawable.ic_menu);
-
+        final PathView pathView = (PathView)findViewById(id.path_view);
         getJson = new ClsGetJson();
         listHashMap = new ArrayList<HashMap<String, String>>();
         listView = (ListView)findViewById(R.id.POIList);
@@ -112,55 +116,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mDrawerLayout.closeDrawers();
-                final Dialog d = new Dialog(context);
                 HashMap item = listHashMap.get(i);
-                d.setTitle(item.get("NOME").toString());
-                d.setCancelable(false);
-                switch(item.get("DATA_TYPE").toString()){
-                    case "MESSAGE":
-                        d.setContentView(layout.message);
-                        TextView tv = (TextView) d.findViewById(id.textView2);
-                        tv.setText(item.get("DATA").toString());
-                        Button okMessage = (Button)d.findViewById(id.messageok);
-                        okMessage.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                d.cancel();
-                            }
-                        });
-                        break;
-                    case "URL":
-                        d.setContentView(layout.url);
-                        TextView tvUrl = (TextView) d.findViewById(id.textView3);
-                        if(!item.get("DATA").toString().contains("http://") || !item.get("DATA").toString().contains("https://")){
-                            tvUrl.setText("http://" + item.get("DATA").toString());
-                        }else {
-                            tvUrl.setText(item.get("DATA").toString());
-                        }
-                        Button okUrl = (Button)d.findViewById(id.urlok);
-                        okUrl.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                d.cancel();
-                            }
-                        });
-
-                        Button apriUrl = (Button)d.findViewById(id.urlapri);
-                        apriUrl.setOnClickListener(new View.OnClickListener(){
-                            public void onClick(View view) {
-                                d.cancel();
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(((TextView)d.findViewById(id.textView3)).getText().toString()));
-                                startActivity(browserIntent);
-                            }
-                        });
-                        break;
-                }
-
-
-
-
-
-                d.show();
+                createDialog(context, item);
+                ArrayList<LocationPosition> lp = new ArrayList<LocationPosition>();
+                lp.add(new LocationPosition(3.87,6.86,245)); //da ingresso
+                lp.add(new LocationPosition(1.65,11.72,245));// a ufficio Nicola
+                lp.add(new LocationPosition(1.65,11.72,245));// da ufficio Nicola
+                lp.add(new LocationPosition(1.29,5.12,245));// a ufficio Piciucchi
+                pathView.setPath(lp);
                 /*String lat = item.get("LAT").toString();
                 String lon = item.get("LON").toString();
                 Toast.makeText(MainActivity.this, lat+lon, Toast.LENGTH_SHORT).show();
@@ -170,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
         CloudCredentials cloudCredentials = g.getCloudCredentials();
         indoorLocationView.setLocation(loc);
+
         Notification.Builder notification = new Notification.Builder(this);
         notification.setSmallIcon(R.drawable.beacon_grey_small);
         notification.setContentTitle("Wander-In");
@@ -214,5 +178,51 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void createDialog(Context context, HashMap item){
+        final Dialog d = new Dialog(context);
+        d.setTitle(item.get("NOME").toString());
+        d.setCancelable(false);
+        switch(item.get("DATA_TYPE").toString()){
+            case "MESSAGE":
+                d.setContentView(layout.message);
+                TextView tv = (TextView) d.findViewById(id.textView2);
+                tv.setText(item.get("DATA").toString());
+                Button okMessage = (Button)d.findViewById(id.messageok);
+                okMessage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        d.cancel();
+                    }
+                });
+                break;
+            case "URL":
+                d.setContentView(layout.url);
+                TextView tvUrl = (TextView) d.findViewById(id.textView3);
+                if(!item.get("DATA").toString().contains("http://") || !item.get("DATA").toString().contains("https://")){
+                    tvUrl.setText("http://" + item.get("DATA").toString());
+                }else {
+                    tvUrl.setText(item.get("DATA").toString());
+                }
+                Button okUrl = (Button)d.findViewById(id.urlok);
+                okUrl.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        d.cancel();
+                    }
+                });
+
+                Button apriUrl = (Button)d.findViewById(id.urlapri);
+                apriUrl.setOnClickListener(new View.OnClickListener(){
+                    public void onClick(View view) {
+                        d.cancel();
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(((TextView)d.findViewById(id.textView3)).getText().toString()));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+        }
+        d.show();
     }
 }
