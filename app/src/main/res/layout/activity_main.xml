@@ -6,19 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.estimote.indoorsdk_module.view.IndoorLocationView
-        android:id="@+id/indoor_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorStroke"
-    />
-
     <altevie.wanderin.utility.PathView
         android:id="@+id/path_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-    />
+        android:background="@color/colorStroke" />
+
+    <com.estimote.indoorsdk_module.view.IndoorLocationView
+        android:id="@+id/indoor_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"/>
 
     <Button
         android:id="@+id/update"
