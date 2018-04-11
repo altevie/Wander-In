@@ -74,7 +74,7 @@ public class PathView extends View {
         }
 
         this.mPaint.setColor(getResources().getColor(R.color.GreenYellow));
-        this.mPaint.setStyle(Paint.Style.STROKE);
+        this.mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.mPaint.setStrokeWidth(30f);
         invalidate();
     }

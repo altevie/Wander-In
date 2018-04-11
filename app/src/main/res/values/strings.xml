@@ -6,6 +6,8 @@
     <string name="app_token">33e715830f87728280a6c45ba483db34</string>
     <string name="loc_id">altevie-roma-f6n</string>
     <string name="url">https://wanderinp1941441869trial.hanatrial.ondemand.com/publicOdata/POIOdata/ZREADPOI.xsodata/POI?$format=json</string>
+    <string name="url_pon">https://wanderinp1941441869trial.hanatrial.ondemand.com/publicOdata/PONOdata/ZREADPON.xsodata/PON?$format=json</string>
+    <string name="url_graph">https://wanderinp1941441869trial.hanatrial.ondemand.com/publicOdata/GraphOdata/ZGRAPH.xsodata/GRAPH?$format=json</string>
     <string name="facebook_app_id">566194790423846</string>
     <string name="fb_login_protocol_scheme">fb566194790423846</string>
 </resources>

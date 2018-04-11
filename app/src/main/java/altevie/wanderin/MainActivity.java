@@ -40,15 +40,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import altevie.wanderin.utility.ClsGetJson;
+import altevie.wanderin.utility.ClsGraph;
 import altevie.wanderin.utility.GlobalObject;
 import altevie.wanderin.utility.PathView;
 import altevie.wanderin.utility.SyncResult;
+import altevie.wanderin.utility.graphDec.AdjacencyListGraph;
 
 import static altevie.wanderin.R.*;
 
 public class MainActivity extends AppCompatActivity {
 
     protected ArrayList<HashMap<String,String>> listHashMap;
+    protected ArrayList<AdjacencyListGraph.DecVertex> listHashMapPoi;
+    protected ArrayList<AdjacencyListGraph.DecVertex> listHashMapPon;
+    protected AdjacencyListGraph graph;
+    private PathView pathView;
+    private ClsGraph CGraph = new ClsGraph();
     private ClsGetJson getJson;
     private JSONArray jArray;
     private JSONObject jobj;
@@ -57,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
+    private LocationPosition locPos = new LocationPosition();
     public RequestQueue queue;
     protected Location loc;
     protected IndoorLocationView indoorLocationView;
@@ -73,9 +81,14 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(drawable.ic_menu);
-        final PathView pathView = (PathView)findViewById(id.path_view);
+        pathView = (PathView)findViewById(id.path_view);
         getJson = new ClsGetJson();
         listHashMap = new ArrayList<HashMap<String, String>>();
+        /////////
+        listHashMapPoi = new ArrayList<AdjacencyListGraph.DecVertex>();
+        listHashMapPon = new ArrayList<AdjacencyListGraph.DecVertex>();
+        graph = new AdjacencyListGraph();
+        ////////////
         listView = (ListView)findViewById(R.id.POIList);
         queue = Volley.newRequestQueue(this);
         context = this;
@@ -92,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getJson.getJSONFromUrl(context,getString(string.url), queue, listHashMap, mAdapter, indoorLocationView, update);
+                getJson.getJSONFromUrl(context,getString(string.url),getString(string.url_pon),getString(string.url_graph), queue, listHashMap, listHashMapPoi, listHashMapPon, graph, mAdapter, indoorLocationView, update);
             }
         });
-        getJson.getJSONFromUrl(this,getString(string.url), queue, listHashMap, mAdapter, indoorLocationView, update);
+        getJson.getJSONFromUrl(context,getString(string.url),getString(string.url_pon),getString(string.url_graph), queue, listHashMap, listHashMapPoi, listHashMapPon, graph, mAdapter, indoorLocationView, update);
 
         mDrawerLayout = findViewById(id.drawer_layout);
         mActivityTitle = getTitle().toString();
@@ -117,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mDrawerLayout.closeDrawers();
                 HashMap item = listHashMap.get(i);
-                createDialog(context, item);
-                ArrayList<LocationPosition> lp = new ArrayList<LocationPosition>();
+                createDialog(context, item, i);
+                /*ArrayList<LocationPosition> lp = new ArrayList<LocationPosition>();
                 lp.add(new LocationPosition(3.87,6.86,245)); //da ingresso
                 lp.add(new LocationPosition(1.65,11.72,245));// a ufficio Nicola
                 lp.add(new LocationPosition(1.65,11.72,245));// da ufficio Nicola
@@ -150,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPositionUpdate(LocationPosition locationPosition) {
                 indoorLocationView.updatePosition(locationPosition);
                 getJson.nearPosition(context, locationPosition);
+                locPos = locationPosition;
             }
 
             @Override
@@ -180,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected void createDialog(Context context, HashMap item){
+    protected void createDialog(final Context context, HashMap item, final int i){
         final Dialog d = new Dialog(context);
         d.setTitle(item.get("NOME").toString());
         d.setCancelable(false);
@@ -194,6 +208,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         d.cancel();
+                    }
+                });
+                Button startNav = (Button)d.findViewById(id.messagenaviga);
+                startNav.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        d.cancel();
+                        CGraph.calcPath(locPos, listHashMapPon,graph, listHashMapPoi, i, context, pathView);
                     }
                 });
                 break;
@@ -219,6 +241,14 @@ public class MainActivity extends AppCompatActivity {
                         d.cancel();
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(((TextView)d.findViewById(id.textView3)).getText().toString()));
                         startActivity(browserIntent);
+                    }
+                });
+                Button startNavUrl = (Button)d.findViewById(id.urlnaviga);
+                startNavUrl.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        d.cancel();
+                        CGraph.calcPath(locPos, listHashMapPon,graph, listHashMapPoi, i, context, pathView);
                     }
                 });
                 break;
