@@ -3,6 +3,7 @@ package altevie.wanderin.utility;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Build;
@@ -76,6 +77,11 @@ public class PathView extends View {
         this.mPaint.setColor(getResources().getColor(R.color.GreenYellow));
         this.mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.mPaint.setStrokeWidth(30f);
+        this.mPaint.setDither(true);
+        this.mPaint.setStrokeJoin(Paint.Join.ROUND);
+        this.mPaint.setStrokeCap(Paint.Cap.ROUND);
+        this.mPaint.setPathEffect(new CornerPathEffect(10) );
+        this.mPaint.setAntiAlias(true);
         invalidate();
     }
 
