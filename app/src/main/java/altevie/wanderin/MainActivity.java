@@ -222,10 +222,10 @@ public class MainActivity extends AppCompatActivity {
             case "URL":
                 d.setContentView(layout.url);
                 TextView tvUrl = (TextView) d.findViewById(id.textView3);
-                if(!item.get("DATA").toString().contains("http://") || !item.get("DATA").toString().contains("https://")){
-                    tvUrl.setText("http://" + item.get("DATA").toString());
-                }else {
+                if(item.get("DATA").toString().contains("http:") || item.get("DATA").toString().contains("https:")){
                     tvUrl.setText(item.get("DATA").toString());
+                }else {
+                    tvUrl.setText("http://" + item.get("DATA").toString());
                 }
                 Button okUrl = (Button)d.findViewById(id.urlok);
                 okUrl.setOnClickListener(new View.OnClickListener() {
